@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// NOTE: SQLite does not support native enums — using String fields with
+// enforced values at the application layer.
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  password      String
+  /// "USER" | "ADMIN"
+  role          String         @default("USER")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  conversations Conversation[]
+  tickets       Ticket[]
+  messages      Message[]
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String    @default("New Conversation")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  ticket    Ticket?
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String?
+  /// "USER" | "ASSISTANT" | "SYSTEM"
+  role           String
+  content        String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Ticket {
+  id             String    @id @default(cuid())
+  conversationId String    @unique
+  userId         String
+  subject        String
+  /// "OPEN" | "PENDING" | "RESOLVED"
+  status         String    @default("OPEN")
+  /// "LOW" | "MEDIUM" | "HIGH" | "URGENT"
+  priority       String    @default("MEDIUM")
+  adminReply     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
