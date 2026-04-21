@@ -120,22 +120,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Demo credentials */}
-        <div className="mt-4 p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-center">
-          <p className="text-xs text-[var(--muted-foreground)] font-medium mb-2">Demo Credentials</p>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-2 rounded-lg bg-[var(--surface-3)]">
-              <p className="font-medium text-[var(--foreground)]">User</p>
-              <p className="text-[var(--muted-foreground)]">user@example.com</p>
-              <p className="text-[var(--muted-foreground)]">User@123</p>
-            </div>
-            <div className="p-2 rounded-lg bg-[var(--surface-3)]">
-              <p className="font-medium text-[var(--foreground)]">Admin</p>
-              <p className="text-[var(--muted-foreground)]">admin@support.com</p>
-              <p className="text-[var(--muted-foreground)]">Admin@123</p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -11,9 +11,10 @@ import { ConversationWithPreview } from "@/types";
 
 interface ChatSidebarProps {
   activeConversationId?: string;
+  onClose?: () => void;
 }
 
-export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
+export function ChatSidebar({ activeConversationId, onClose }: ChatSidebarProps) {
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -52,6 +53,7 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
         const conv = await res.json();
         router.push(`/chat/${conv.id}`);
         fetchConversations();
+        onClose?.();
       }
     } finally {
       setCreating(false);
@@ -72,7 +74,7 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
   }
 
   return (
-    <aside className="w-72 flex flex-col h-full border-r border-[var(--border)] bg-[var(--surface)]">
+    <aside className="w-72 sm:w-80 lg:w-72 flex flex-col h-full border-r border-[var(--border)] bg-[var(--surface)] shadow-2xl lg:shadow-none">
       {/* Header */}
       <div className="p-4 border-b border-[var(--border)]">
         <div className="flex items-center justify-between mb-4">
@@ -84,6 +86,13 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
             </div>
             <span className="font-semibold text-[var(--foreground)]">SupportAI</span>
           </div>
+          {onClose && (
+            <button onClick={onClose} className="lg:hidden p-2 text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
         <Button
           onClick={handleNewChat}
@@ -118,7 +127,10 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
           conversations.map((conv) => (
             <button
               key={conv.id}
-              onClick={() => router.push(`/chat/${conv.id}`)}
+              onClick={() => {
+                router.push(`/chat/${conv.id}`);
+                onClose?.();
+              }}
               className={`
                 w-full text-left px-4 py-3 hover:bg-[var(--surface-3)] transition-all duration-150
                 border-l-2 group
@@ -176,7 +188,10 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
             </p>
           </div>
           <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={() => {
+              onClose?.();
+              signOut({ callbackUrl: "/login" });
+            }}
             className="p-1.5 rounded-lg hover:bg-[var(--surface-3)] text-[var(--muted-foreground)] hover:text-red-400 transition-colors"
             title="Sign out"
           >

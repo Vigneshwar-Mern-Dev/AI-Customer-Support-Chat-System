@@ -78,14 +78,21 @@ export async function getAIResponse(
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const isGroq = process.env.OPENAI_API_KEY.startsWith("gsk_");
+    const endpoint = isGroq 
+      ? "https://api.groq.com/openai/v1/chat/completions" 
+      : "https://api.openai.com/v1/chat/completions";
+    
+    const model = isGroq ? "llama-3.3-70b-versatile" : "gpt-3.5-turbo";
+
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: model,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...messages.slice(-10),
